@@ -1,9 +1,9 @@
 import { getFixed } from '.';
-import { Prices, UpdatedResult } from '../types';
+import { CurrencyCode, Prices, UpdatedResult } from '../types';
 
 export const getAverageMove = (
   result: UpdatedResult,
-  currencyCode: 'eur' | 'gbp' | 'aud' | 'nzd' | 'usd' | 'cad' | 'chf' | 'jpy'
+  currencyCode: CurrencyCode
 ) => {
   const relatedCurrencies = Object.keys(result).filter((currencyName) =>
     currencyName.includes(currencyCode)
@@ -18,7 +18,7 @@ export const getAverageMove = (
             ? result[name].percentage
             : -result[name].percentage
         )
-        .reduce((acc, current) => acc + current, 0),
+        .reduce((acc, current) => acc + current, 0) / 7,
       2
     ),
     pips: getFixed(
@@ -26,7 +26,7 @@ export const getAverageMove = (
         .map((name) =>
           name.startsWith(currencyCode) ? result[name].diff : -result[name].diff
         )
-        .reduce((acc, current) => acc + current, 0),
+        .reduce((acc, current) => acc + current, 0) / 7,
       1
     ),
   };

@@ -9,4 +9,18 @@ body {
     'Oxygen', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #0d1b2a;
+}
+
+::-webkit-scrollbar {
+  width: 16px;
+}
+::-webkit-scrollbar-track {
+  background: #051324;
+}
+::-webkit-scrollbar-thumb {
+  background: #112235;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #13263b;
 }
