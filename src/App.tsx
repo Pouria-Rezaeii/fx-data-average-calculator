@@ -44,7 +44,7 @@ export default function App() {
   const getFirstOfWeekTheme = (time: string) => {
     if (getHour(time) === '00') return c.startOfWeek;
   };
-  const getColorize = (value: number) => {
+  const getColor = (value: number) => {
     return value > 0 ? c.green : value < 0 ? c.red : c.gray;
   };
 
@@ -53,7 +53,6 @@ export default function App() {
       <td></td>
       {fullHistory.map(({ time }) => {
         const day = time.split(' ')[0].split('-');
-        console.log(time.split(' '));
         return (
           <td key={time} className={clsx(c.time, getFirstOfWeekTheme(time))}>
             {day.map((item) => (
@@ -83,7 +82,7 @@ export default function App() {
                     <td
                       key={time}
                       className={clsx(
-                        getColorize(averageMove[code].percentage),
+                        getColor(averageMove[code].percentage),
                         getFirstOfWeekTheme(time)
                       )}
                     >
@@ -109,7 +108,7 @@ export default function App() {
                       <div>{curr.close}</div>
                       <div className={c.currencyDiff}>
                         <span>{getFixed(curr.diff, 1)}</span>
-                        <span className={getColorize(curr.percentage)}>
+                        <span className={getColor(curr.percentage)}>
                           {Math.abs(getFixed(curr.percentage, 2))}
                         </span>
                       </div>
@@ -130,7 +129,7 @@ const useStyles = makeStyles((theme) => ({
   container: {
     width: '100%',
     minHeight: '100vh',
-    padding: '4rem 20rem 0 1rem',
+    padding: '4rem 20rem 0 100vw',
   },
   table: {
     color: 'silver',
