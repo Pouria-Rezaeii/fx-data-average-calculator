@@ -1,7 +1,12 @@
 import React from 'react';
 import { getFixed, generateAllPrices, getAverageMove } from './services/utils';
 import { data } from './services/data';
-import { Prices, UpdatedResult, FullHistory } from './services/types';
+import {
+  Prices,
+  UpdatedResult,
+  FullHistory,
+  CurrencyCode,
+} from './services/types';
 import { makeStyles } from '@material-ui/styles';
 import { currencyCodes } from './services/constants';
 import clsx from 'clsx';
@@ -14,8 +19,8 @@ export default function App() {
     prices: generateAllPrices(prices),
   }));
 
-  const fullHistory: FullHistory[] = history.map(({ time, prices }, index) => {
-    const updatedResult: Partial<UpdatedResult> = {};
+  let fullHistory: FullHistory[] = history.map(({ time, prices }, index) => {
+    const updatedResult = {} as UpdatedResult;
     Object.keys(prices).forEach((_currency) => {
       const currency = _currency as keyof Prices;
       const current = prices[currency];
@@ -28,15 +33,42 @@ export default function App() {
       };
     });
 
-    const averageMove: Partial<FullHistory['averageMove']> = {};
+    const averageMove = {} as FullHistory['averageMove'];
     currencyCodes.forEach((code) => {
-      averageMove[code] = getAverageMove(updatedResult as UpdatedResult, code);
+      averageMove[code] = getAverageMove(updatedResult, code);
     });
 
     return {
       time,
-      prices: updatedResult as UpdatedResult,
-      averageMove: averageMove as FullHistory['averageMove'],
+      prices: updatedResult,
+      averageMove: averageMove,
+    };
+  });
+
+  fullHistory.forEach((item, index) => {
+    let averageMoveWithHypotheticalAmount = {} as FullHistory['averageMove'];
+    Object.keys(item.averageMove).forEach((_currencyCode) => {
+      const currencyCode = _currencyCode as CurrencyCode;
+      const lastHypotheticalAmount =
+        index === 0
+          ? 100
+          : fullHistory[index - 1].averageMove[currencyCode]
+              .hypotheticalAmount || 0;
+
+      averageMoveWithHypotheticalAmount[currencyCode] = {
+        ...item.averageMove[currencyCode],
+        hypotheticalAmount: getFixed(
+          lastHypotheticalAmount +
+            (lastHypotheticalAmount *
+              item.averageMove[currencyCode].percentage) /
+              100,
+          5
+        ),
+      };
+    });
+    fullHistory[index] = {
+      ...item,
+      averageMove: averageMoveWithHypotheticalAmount,
     };
   });
 
@@ -72,6 +104,16 @@ export default function App() {
       <div style={{ display: 'flex' }}>
         <table className={c.table}>
           <tbody>
+            <tr>
+              <td />
+              {fullHistory.map((_) => (
+                <td>
+                  <label style={{ padding: '8px 16px' }}>
+                    <input type="checkbox" />
+                  </label>
+                </td>
+              ))}
+            </tr>
             {renderTimes()}
             {/* rendering moving averages */}
             {currencyCodes.map((code) => (
@@ -87,12 +129,34 @@ export default function App() {
                       )}
                     >
                       {Math.abs(averageMove[code].percentage)}
+                      <div
+                        className={clsx(
+                          c.hypotheticalAmount,
+                          ((averageMove[code].hypotheticalAmount || 0) >=
+                            100.5 ||
+                            (averageMove[code].hypotheticalAmount || 0) <=
+                              99.5) &&
+                            c.yellow
+                        )}
+                      >
+                        {getFixed(averageMove[code].hypotheticalAmount || 0, 2)}
+                      </div>
                     </td>
                   );
                 })}
               </tr>
             ))}
             <tr style={{ height: '4rem' }} />
+            <tr>
+              <td />
+              {fullHistory.map((_) => (
+                <td>
+                  <label style={{ padding: '8px 16px' }}>
+                    <input type="checkbox" />
+                  </label>
+                </td>
+              ))}
+            </tr>
             {renderTimes()}
             {/* rendering currency prices */}
             {Object.keys(history[0].prices).map((currency) => (
@@ -129,7 +193,7 @@ const useStyles = makeStyles((theme) => ({
   container: {
     width: '100%',
     minHeight: '100vh',
-    padding: '4rem 20rem 0 100vw',
+    padding: '4rem 20rem 0 2rem',
   },
   table: {
     color: 'silver',
@@ -138,7 +202,7 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: 6,
     '& td': {
       border: 'solid 1px #555',
-      padding: '9px 11px',
+      padding: '9px 7px',
       textAlign: 'center',
     },
   },
@@ -157,6 +221,11 @@ const useStyles = makeStyles((theme) => ({
     '& > *:nth-of-type(2)': {
       borderBottom: '1px solid #937027',
     },
+  },
+  hypotheticalAmount: {
+    fontSize: 11,
+    color: '#888',
+    marginTop: 4,
   },
   startOfWeek: {
     backgroundColor: '#0F1523',
@@ -190,5 +259,8 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     justifyContent: 'space-between',
     fontSize: 10,
+  },
+  yellow: {
+    color: '#ddd',
   },
 }));
