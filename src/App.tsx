@@ -10,6 +10,7 @@ import {
 import { makeStyles } from '@material-ui/styles';
 import { currencyCodes } from './services/constants';
 import clsx from 'clsx';
+import LineChart from './components/LineChart';
 
 export default function App() {
   const c = useStyles();
@@ -101,13 +102,33 @@ export default function App() {
 
   return (
     <div className={c.container}>
+      {/* rendering charts */}
+      <div style={{ marginBottom: '4rem' }}>
+        {currencyCodes.map((code) => (
+          <div key={code} style={{ marginBottom: '1.5rem' }}>
+            <LineChart
+              label={code}
+              data={[{ value: 1 }, { value: -1 }].concat(
+                fullHistory.map(({ time, averageMove }) => ({
+                  value: (averageMove[code].hypotheticalAmount || 0) - 100,
+                  time,
+                  label:
+                    getHour(time) !== '00'
+                      ? time.split('=')[1]
+                      : `${time.split(' ')[0]}`,
+                }))
+              )}
+            />
+          </div>
+        ))}
+      </div>
       <div style={{ display: 'flex' }}>
         <table className={c.table}>
           <tbody>
             <tr>
               <td />
-              {fullHistory.map((_) => (
-                <td>
+              {fullHistory.map(({ time }) => (
+                <td key={time}>
                   <label style={{ padding: '8px 16px' }}>
                     <input type="checkbox" />
                   </label>
@@ -119,38 +140,35 @@ export default function App() {
             {currencyCodes.map((code) => (
               <tr key={code}>
                 <td className={c.currencyCode}>{code}</td>
-                {fullHistory.map(({ averageMove, time }) => {
-                  return (
-                    <td
-                      key={time}
+                {fullHistory.map(({ averageMove, time }) => (
+                  <td
+                    key={time}
+                    className={clsx(
+                      getColor(averageMove[code].percentage),
+                      getFirstOfWeekTheme(time)
+                    )}
+                  >
+                    {Math.abs(averageMove[code].percentage)}
+                    <div
                       className={clsx(
-                        getColor(averageMove[code].percentage),
-                        getFirstOfWeekTheme(time)
+                        c.hypotheticalAmount,
+                        ((averageMove[code].hypotheticalAmount || 0) >= 100.5 ||
+                          (averageMove[code].hypotheticalAmount || 0) <=
+                            99.5) &&
+                          c.yellow
                       )}
                     >
-                      {Math.abs(averageMove[code].percentage)}
-                      <div
-                        className={clsx(
-                          c.hypotheticalAmount,
-                          ((averageMove[code].hypotheticalAmount || 0) >=
-                            100.5 ||
-                            (averageMove[code].hypotheticalAmount || 0) <=
-                              99.5) &&
-                            c.yellow
-                        )}
-                      >
-                        {getFixed(averageMove[code].hypotheticalAmount || 0, 2)}
-                      </div>
-                    </td>
-                  );
-                })}
+                      {getFixed(averageMove[code].hypotheticalAmount || 0, 2)}
+                    </div>
+                  </td>
+                ))}
               </tr>
             ))}
             <tr style={{ height: '4rem' }} />
             <tr>
               <td />
-              {fullHistory.map((_) => (
-                <td>
+              {fullHistory.map(({ time }) => (
+                <td key={time}>
                   <label style={{ padding: '8px 16px' }}>
                     <input type="checkbox" />
                   </label>
