@@ -1,15 +1,6 @@
-export const data: {
-  time: string;
-  prices: {
-    eurgbp: number;
-    gbpaud: number;
-    audnzd: number;
-    nzdusd: number;
-    usdcad: number;
-    cadchf: number;
-    chfjpy: number;
-  };
-}[] = [
+import { Data } from './types';
+
+export const data: Data = [
   {
     time: '21-10-25 T=00:00:00',
     prices: {
@@ -148,7 +139,7 @@ export const data: {
       eurgbp: 0.84169,
       gbpaud: 1.83443,
       audnzd: 1.0461,
-      nzdusd: 0.71558,
+      nzdusd: 0.71588,
       usdcad: 1.23847,
       cadchf: 0.74175,
       chfjpy: 1.24033,
