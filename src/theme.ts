@@ -3,7 +3,12 @@ import '@material-ui/styles';
 export const theme = {
   palette: {
     primary: '#FF6060',
-    secondary: '#FF0066',
+    secondary: {
+      main: '#264653',
+    },
+    text: {
+      primary: '#232323',
+    },
   },
 };
 

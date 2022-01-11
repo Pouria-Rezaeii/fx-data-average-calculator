@@ -24,7 +24,7 @@ export default function LineChart({ data, label }: LineChartProps) {
   return (
     <div className={c.root}>
       <span className={c.label}>{label}</span>
-      <ResponsiveContainer height={360}>
+      <ResponsiveContainer height={660} width={128 + data.length * 16}>
         <LChart data={data}>
           <CartesianGrid
             vertical={true}
@@ -35,7 +35,7 @@ export default function LineChart({ data, label }: LineChartProps) {
             dataKey="label"
             strokeWidth={0}
             interval={0}
-            style={{ fontSize: 10 }}
+            style={{ fontSize: 8 }}
           />
           <YAxis
             strokeWidth={0}
@@ -75,7 +75,7 @@ export default function LineChart({ data, label }: LineChartProps) {
   );
 }
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
     flexDirection: 'column',
@@ -83,7 +83,7 @@ const useStyles = makeStyles(() => ({
     backgroundColor: 'white',
     padding: '.75rem 4rem 0 1rem',
     gap: 64,
-    '& .recharts-yAxis': {},
+    overflowX: 'scroll',
   },
   wrapper: {
     '&:last-child,&:nth-last-child(2)': {
@@ -91,9 +91,10 @@ const useStyles = makeStyles(() => ({
     },
   },
   label: {
-    backgroundColor: '#264653',
+    color: theme.palette.secondary.main,
     alignSelf: 'flex-start',
-    color: 'white',
+    border: `solid 1px ${theme.palette.secondary.main}`,
+    textTransform: 'uppercase',
     padding: '.3rem 1rem',
     borderRadius: 4,
   },
