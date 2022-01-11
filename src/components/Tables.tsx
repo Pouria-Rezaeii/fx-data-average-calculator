@@ -9,7 +9,7 @@ interface IProps {
   history: FullHistory[];
 }
 
-export default function Tables({ history: fullHistory }: IProps) {
+function Tables({ history: fullHistory }: IProps) {
   const c = useStyles();
 
   const getFirstOfDayTheme = (time: string) => {
@@ -20,15 +20,17 @@ export default function Tables({ history: fullHistory }: IProps) {
     return value > 0 ? c.green : value < 0 ? c.red : c.gray;
   };
 
-  const renderTimes = () => (
+  const timeRow = (
     <tr>
       <td></td>
       {fullHistory.map(({ time }) => {
         const day = time.split(' ')[0].split('-');
+        console.log('cal');
+
         return (
           <td key={time} className={clsx(c.time, getFirstOfDayTheme(time))}>
-            {day.map((item) => (
-              <div key={item}>{item}</div>
+            {day.map((item, index) => (
+              <div key={index}>{item}</div>
             ))}
             <div>{getHour(time)}</div>
           </td>
@@ -41,7 +43,7 @@ export default function Tables({ history: fullHistory }: IProps) {
     <div style={{ display: 'flex' }}>
       <table className={c.table}>
         <tbody>
-          {renderTimes()}
+          {timeRow}
           {/* rendering moving averages */}
           {currencyCodes.map((code) => (
             <tr key={code}>
@@ -63,7 +65,7 @@ export default function Tables({ history: fullHistory }: IProps) {
             </tr>
           ))}
           <tr style={{ height: '4rem' }} />
-          {renderTimes()}
+          {timeRow}
           {/* rendering currency prices */}
           {Object.keys(fullHistory[0].prices).map((currency) => (
             <tr key={currency}>
@@ -93,6 +95,8 @@ export default function Tables({ history: fullHistory }: IProps) {
     </div>
   );
 }
+
+export default React.memo(Tables, () => true);
 
 const useStyles = makeStyles((theme) => ({
   table: {
